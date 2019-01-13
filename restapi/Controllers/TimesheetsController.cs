@@ -354,6 +354,45 @@ namespace restapi.Controllers
             {
                 return NotFound();
             }
-        }        
+        } 
+        
+
+        /**
+        1) Remove (DELETE) a draft or cancelled timecards
+         */ 
+        [HttpDelete("{id}/remove")]
+        [Produces(ContentTypes.Transition)]
+        [ProducesResponseType(typeof(Transition), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(InvalidStateError), 409)]
+        [ProducesResponseType(typeof(EmptyTimecardError), 409)]
+        public IActionResult RemoveTimeCard(string id, [FromBody] Remove remove)
+        {
+            Timecard timecard = Database.Find(id);
+
+            if (timecard != null)
+            {
+                if (timecard.Status == TimecardStatus.Draft || timecard.Status == TimecardStatus.Cancelled )
+                {
+                    
+                var transition = new Transition(remove, TimecardStatus.Removed);
+                timecard.Transitions.Add(transition);
+                Database.Delete(timecard);
+            
+                return Ok(transition);
+                }
+                
+                else{
+
+                    return StatusCode(409, new InvalidStateError() { });
+                }
+            
+
+            }
+            else
+            {
+                return NotFound();
+            }
+        }  
     }
 }

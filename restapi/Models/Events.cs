@@ -18,6 +18,8 @@ namespace restapi.Models
         public string Reason { get; set; }        
     }
 
+
+
     public class Rejection : Event
     {
         public string Reason { get; set; }        
@@ -25,5 +27,11 @@ namespace restapi.Models
 
     public class Approval : Event
     {
+    }
+
+
+    public class Remove : Event
+    {
+        public string Reason { get; set; }        
     }
 }

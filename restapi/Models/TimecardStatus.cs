@@ -10,6 +10,10 @@ namespace restapi.Models
 
         Cancelled,
 
-        Approved
+
+
+        Approved,
+
+        Removed
     }
 }

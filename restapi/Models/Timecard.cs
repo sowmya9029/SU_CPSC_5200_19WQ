@@ -83,6 +83,13 @@ namespace restapi.Models
                         Relationship = ActionRelationship.RecordLine,
                         Reference = $"/timesheets/{Identity.Value}/lines"
                     });
+
+                    links.Add(new ActionLink() {
+                        Method = Method.Delete,
+                        Type = ContentTypes.TimesheetLine,
+                        Relationship = ActionRelationship.Remove,
+                        Reference = $"/timesheets/{Identity.Value}/remove"
+                    });
                 
                     break;
 
@@ -108,6 +115,13 @@ namespace restapi.Models
                         Reference = $"/timesheets/{Identity.Value}/approval"
                     });
 
+                    
+                    links.Add(new ActionLink() {
+                        Method = Method.Delete,
+                        Type = ContentTypes.TimesheetLine,
+                        Relationship = ActionRelationship.Remove,
+                        Reference = $"/timesheets/{Identity.Value}/remove"
+                    });
                     break;
 
                 case TimecardStatus.Approved:
@@ -115,6 +129,10 @@ namespace restapi.Models
                     break;
 
                 case TimecardStatus.Cancelled:
+                    // terminal state, nothing possible here
+                    break;
+
+                case TimecardStatus.Removed:
                     // terminal state, nothing possible here
                     break;
             }
