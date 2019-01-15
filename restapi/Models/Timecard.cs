@@ -182,5 +182,15 @@ namespace restapi.Models
 
             return annotatedLine;
         }
+
+
+        public AnnotatedTimecardLine ReplaceLine(TimecardLine timecardLine)
+        {
+            var annotatedLine = new AnnotatedTimecardLine(timecardLine);
+            
+             
+
+            return annotatedLine;
+        }
     }
 }

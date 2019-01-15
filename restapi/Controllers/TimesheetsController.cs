@@ -93,6 +93,7 @@ namespace restapi.Controllers
 
                 var annotatedLine = timecard.AddLine(timecardLine);
 
+
                 return Ok(annotatedLine);
             }
             else
@@ -310,7 +311,7 @@ namespace restapi.Controllers
 
             if (timecard != null)
             {
-                if (timecard.Status != TimecardStatus.Submitted)
+                if (timecard.Status != TimecardStatus.Submitted || approval.Resource.Equals(timecard.Resource))
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
@@ -394,5 +395,33 @@ namespace restapi.Controllers
                 return NotFound();
             }
         }  
+
+        [HttpPost("{id}/replace")]
+        [Produces(ContentTypes.TimesheetLine)]
+        [ProducesResponseType(typeof(AnnotatedTimecardLine), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(InvalidStateError), 409)]
+        public IActionResult ReplaceLine(string id, [FromBody] TimecardLine timecardLine)
+        {
+            Timecard timecard = Database.Find(id);
+
+            if (timecard != null)
+            {
+                if (timecard.Status != TimecardStatus.Draft)
+                {
+                    return StatusCode(409, new InvalidStateError() { });
+                }
+
+                var annotatedLine = timecard.ReplaceLine(timecardLine);
+
+                return Ok(annotatedLine);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        
     }
 }
