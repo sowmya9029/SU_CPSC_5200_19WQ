@@ -91,7 +91,7 @@ namespace restapi.Controllers
                     return StatusCode(409, new InvalidStateError() { });
                 }
 
-                var annotatedLine = timecard.AddLine(timecardLine);
+                var annotatedLine = timecard.AddLine(timecardLine,timecard);
 
 
                 return Ok(annotatedLine);
@@ -132,7 +132,7 @@ namespace restapi.Controllers
 
             if (timecard != null)
             {
-                if (timecard.Status != TimecardStatus.Draft)
+                if (timecard.Status != TimecardStatus.Draft  || !submittal.Resource.Equals(timecard.Resource)) 
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
@@ -162,7 +162,7 @@ namespace restapi.Controllers
             Timecard timecard = Database.Find(id);
 
             if (timecard != null)
-            {
+            { 
                 if (timecard.Status == TimecardStatus.Submitted)
                 {
                     var transition = timecard.Transitions
@@ -183,6 +183,8 @@ namespace restapi.Controllers
             }
         }
 
+
+      
         [HttpPost("{id}/cancellation")]
         [Produces(ContentTypes.Transition)]
         [ProducesResponseType(typeof(Transition), 200)]
@@ -195,7 +197,8 @@ namespace restapi.Controllers
 
             if (timecard != null)
             {
-                if (timecard.Status != TimecardStatus.Draft && timecard.Status != TimecardStatus.Submitted)
+                //cancellation can be done if its same resource
+                if ((timecard.Status != TimecardStatus.Draft && timecard.Status != TimecardStatus.Submitted )|| !cancellation.Resource.Equals(timecard.Resource))
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
@@ -253,7 +256,8 @@ namespace restapi.Controllers
 
             if (timecard != null)
             {
-                if (timecard.Status != TimecardStatus.Submitted)
+                //rejection cannot be done by same resource
+                if (timecard.Status != TimecardStatus.Submitted || rejection.Resource.Equals(timecard.Resource))
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
@@ -311,6 +315,7 @@ namespace restapi.Controllers
 
             if (timecard != null)
             {
+                //approval cannot be done by same resource part 4 of the assignment 
                 if (timecard.Status != TimecardStatus.Submitted || approval.Resource.Equals(timecard.Resource))
                 {
                     return StatusCode(409, new InvalidStateError() { });
@@ -363,17 +368,18 @@ namespace restapi.Controllers
          */ 
         [HttpDelete("{id}/remove")]
         [Produces(ContentTypes.Transition)]
-        [ProducesResponseType(typeof(Transition), 200)]
+       // [ProducesResponseType(typeof(Transition), 200)]
         [ProducesResponseType(404)]
-        [ProducesResponseType(typeof(InvalidStateError), 409)]
-        [ProducesResponseType(typeof(EmptyTimecardError), 409)]
+       // [ProducesResponseType(typeof(InvalidStateError), 409)]
+        //[ProducesResponseType(typeof(EmptyTimecardError), 409)]
         public IActionResult RemoveTimeCard(string id, [FromBody] Remove remove)
         {
             Timecard timecard = Database.Find(id);
 
             if (timecard != null)
             {
-                if (timecard.Status == TimecardStatus.Draft || timecard.Status == TimecardStatus.Cancelled )
+                //remove should be done same resource
+                if (timecard.Status == TimecardStatus.Draft || timecard.Status == TimecardStatus.Cancelled || remove.Resource.Equals(timecard.Resource)  )
                 {
                     
                 var transition = new Transition(remove, TimecardStatus.Removed);
@@ -383,7 +389,8 @@ namespace restapi.Controllers
                 return Ok(transition);
                 }
                 
-                else{
+                else
+                {
 
                     return StatusCode(409, new InvalidStateError() { });
                 }
@@ -395,7 +402,7 @@ namespace restapi.Controllers
                 return NotFound();
             }
         }  
-
+     /*Replace (POST) a complete line item */
         [HttpPost("{id}/replace")]
         [Produces(ContentTypes.TimesheetLine)]
         [ProducesResponseType(typeof(AnnotatedTimecardLine), 200)]
@@ -407,14 +414,51 @@ namespace restapi.Controllers
 
             if (timecard != null)
             {
+                if (timecard.Status != TimecardStatus.Draft )
+                {
+                    return StatusCode(409, new InvalidStateError() { });
+                }
+
+                var annotatedLine = timecard.ReplaceLine(timecard,timecardLine);
+                if(annotatedLine==null)
+                {
+                    return NotFound();
+                }
+                return Ok(annotatedLine);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+      /*Update (PATCH) a line item */
+        [HttpPatch("{id}/update")]
+        [Produces(ContentTypes.TimesheetLine)]
+        [ProducesResponseType(typeof(AnnotatedTimecardLine), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(typeof(InvalidStateError), 409)]
+        public IActionResult UpdateLine(string id, [FromBody] TimecardLine timecardLine)
+        {
+            Timecard timecard = Database.Find(id);
+
+            if (timecard != null || timecardLine!=null)
+            {
+                
                 if (timecard.Status != TimecardStatus.Draft)
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
 
-                var annotatedLine = timecard.ReplaceLine(timecardLine);
-
-                return Ok(annotatedLine);
+                
+                    var annotatedLine = timecard.UpdateLine(timecard,timecardLine);  
+                    if(annotatedLine==null)
+                    {
+                        return NotFound();
+                    }  
+                    return Ok(annotatedLine);
+                
+              
             }
             else
             {

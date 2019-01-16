@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using Newtonsoft.Json;
 
@@ -15,6 +16,8 @@ namespace restapi.Models
         public float Hours { get; set; }
 
         public string Project { get; set; }
+
+        public float LineNumber{get;set;}
     }
 
     public class AnnotatedTimecardLine : TimecardLine
@@ -23,14 +26,15 @@ namespace restapi.Models
         private DateTime? periodFrom;
         private DateTime? periodTo;
 
-        public AnnotatedTimecardLine(TimecardLine line)
+        public AnnotatedTimecardLine(TimecardLine line,float lineNumber)
         {
             Week = line.Week;
             Year = line.Year;
             Day = line.Day;
             Hours = line.Hours;
-            Project = line.Project;
-
+            Project = line.Project;   
+           
+           
             Recorded = DateTime.UtcNow;
             workDate = FirstDateOfWeekISO8601(line.Year, line.Week).AddDays((int)line.Day - 1);
             UniqueIdentifier = Guid.NewGuid();
@@ -40,7 +44,7 @@ namespace restapi.Models
 
         public string WorkDate { get => workDate.ToString("yyyy-MM-dd"); }
 
-        public float LineNumber { get; set; }
+       // public float LineNumber { get; set; }
 
         [JsonProperty("recId")]
         public int RecordIdentity { get; set; } = 0;
@@ -54,7 +58,7 @@ namespace restapi.Models
 
         public string PeriodTo { get => periodTo?.ToString("yyyy-MM-dd"); }
 
-        public string Version { get; set; } = "line-0.1";
+        public string Version { get; set; } = "line-0.2";
 
         private static DateTime FirstDateOfWeekISO8601(int year, int weekOfYear)
         {
