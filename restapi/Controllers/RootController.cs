@@ -12,18 +12,28 @@ namespace restapi.Controllers
         [HttpGet]
         [Produces(ContentTypes.Root)]
         [ProducesResponseType(typeof(IDictionary<ApplicationRelationship, DocumentLink>), 200)]
-        public IDictionary<ApplicationRelationship, DocumentLink> Get()
+        public IDictionary<ApplicationRelationship, List<DocumentLink>> Get()
         {
-            return new Dictionary<ApplicationRelationship, DocumentLink>()
+            return new Dictionary<ApplicationRelationship, List<DocumentLink>>()
             {  
                 { 
-                    ApplicationRelationship.Timesheets, new DocumentLink() 
-                    { 
-                        Method = Method.Get,
-                        Type = ContentTypes.Timesheets,
-                        Relationship = DocumentRelationship.Timesheets,
-                        Reference = "/timesheets"
-                    }   
+                    ApplicationRelationship.Timesheets, new List<DocumentLink>() 
+                    {
+                         new DocumentLink() 
+                        { 
+                            Method = Method.Get,
+                            Type = ContentTypes.Timesheets,
+                            Relationship = DocumentRelationship.Timesheets,
+                            Reference = "/timesheets"
+                        },   
+                         new DocumentLink() 
+                        { 
+                            Method = Method.Post,
+                            Type = ContentTypes.Timesheet,
+                            Relationship = DocumentRelationship.CreateTimesheet,
+                            Reference = "/timesheets"
+                        }   
+                    }
                 }
             };
         }
