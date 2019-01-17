@@ -103,7 +103,7 @@ Notice in this case that the Content-Type is a generic JSON request. This is not
 
     POST /timesheets HTTP/1.1
     Accept: application/com.my-company.my-product.timesheet+json
-    Content-Type: application/json
+    Content-Type: 
     X-Requested-With: XMLHttpRequest
     Content-Length: 15
     
@@ -364,6 +364,24 @@ Notice that we’ve asked the service to respond back with a timesheet object by
                 "rel": "cancel",
                 "href": "/timesheets/dat-4035447427/cancellation"
             }
+            {
+                "method": "PATCH",
+                "type": "application/com.my-company.my-product.timesheet-cancellation",
+                "rel": "update",
+                "href": "/timesheets/dat-4035447427/update"
+            }
+             {
+                "method": "DELETE",
+                "type": "application/com.my-company.my-product.timesheet-cancellation",
+                "rel": "remove",
+                "href": "/timesheets/dat-4035447427/remove"
+            }
+            {
+                "method": "PUT",
+                "type": "application/com.my-company.my-product.timesheet-cancellation",
+                "rel": "replace",
+                "href": "/timesheets/dat-4035447427/replace"
+            }
         ],
         "documentation": [
             {
@@ -425,6 +443,46 @@ Next, we will cancel this timesheet (in this case the same resource is doing the
         "reason": "Not enough information provided. Please complete the timesheet and resubmit."
     }
 
+Next, delete a cancelled or drafted timecard
+
+    DELETE /timesheets/dat-4035447427/cancellation HTTP/1.1
+    Accept: application/com.my-company.my-product.timesheet+json
+    Content-Type: application/json
+    X-Requested-With: XMLHttpRequest
+    Content-Length: 102
+    
+    {
+        "resource": 1,
+    }
+
+    Next, update a particular atribute of line item
+
+    PATCH /timesheets/dat-4035447427/cancellation HTTP/1.1
+    Accept: application/com.my-company.my-product.timesheet+json
+    Content-Type: application/json
+    X-Requested-With: XMLHttpRequest
+    Content-Length: 102
+    
+    {
+        "resource": 1,
+        "hours": 8, "project": "SEGR 5240" ,"lineNumber" :1
+    }
+ Next, replace a line item
+
+    PUT /timesheets/dat-4035447427/cancellation HTTP/1.1
+    Accept: application/com.my-company.my-product.timesheet+json
+    Content-Type: application/json
+    X-Requested-With: XMLHttpRequest
+    Content-Length: 102
+    
+    {
+         "resource": 1,
+         "week": 2, "year": 2018, "day": "thursday", "hours": 8, "project": "SEGR 5240" ,"lineNumber" :1
+    }
+
+
+
+    
 And, once again, the service responds with the updated timesheet.
 
     HTTP/1.1 200 OK

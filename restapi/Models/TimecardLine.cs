@@ -17,8 +17,36 @@ namespace restapi.Models
 
         public string Project { get; set; }
 
+    }
+ // model for http put request 
+  public class TimecardPutLine
+    {
+
+        public int Week { get; set; }
+
+        public int Year { get; set; }
+
+        public DayOfWeek Day { get; set; }
+
+        public float Hours { get; set; }
+
+        public string Project { get; set; }
+
+
+        [JsonRequired]
         public float LineNumber{get;set;}
     }
+
+  // model for http patch request 
+  public class TimecardPatchLine
+    {
+        public Nullable<int> Hours { get; set; }
+
+        public string Project { get; set; }
+        [JsonRequired]
+        public float LineNumber{get;set;}
+    }
+
 
     public class AnnotatedTimecardLine : TimecardLine
     {
@@ -26,18 +54,19 @@ namespace restapi.Models
         private DateTime? periodFrom;
         private DateTime? periodTo;
 
+        [JsonRequired]
+        public float LineNumber{get;set;}
         public AnnotatedTimecardLine(TimecardLine line,float lineNumber)
         {
             Week = line.Week;
             Year = line.Year;
             Day = line.Day;
             Hours = line.Hours;
-            Project = line.Project;   
-           
-           
+            Project = line.Project;             
             Recorded = DateTime.UtcNow;
             workDate = FirstDateOfWeekISO8601(line.Year, line.Week).AddDays((int)line.Day - 1);
             UniqueIdentifier = Guid.NewGuid();
+            LineNumber= lineNumber;
         }
 
         public DateTime Recorded { get; set; }

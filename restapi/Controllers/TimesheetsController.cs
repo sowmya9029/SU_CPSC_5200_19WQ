@@ -368,10 +368,10 @@ namespace restapi.Controllers
          */ 
         [HttpDelete("{id}/remove")]
         [Produces(ContentTypes.Transition)]
-       // [ProducesResponseType(typeof(Transition), 200)]
+        [ProducesResponseType(typeof(Transition), 200)]
         [ProducesResponseType(404)]
-       // [ProducesResponseType(typeof(InvalidStateError), 409)]
-        //[ProducesResponseType(typeof(EmptyTimecardError), 409)]
+        [ProducesResponseType(typeof(InvalidStateError), 409)]
+        [ProducesResponseType(typeof(EmptyTimecardError), 409)]
         public IActionResult RemoveTimeCard(string id, [FromBody] Remove remove)
         {
             Timecard timecard = Database.Find(id);
@@ -402,13 +402,13 @@ namespace restapi.Controllers
                 return NotFound();
             }
         }  
-     /*Replace (POST) a complete line item */
-        [HttpPost("{id}/replace")]
+     /*Replace (PUT) a complete line item */
+        [HttpPut("{id}/replace")]
         [Produces(ContentTypes.TimesheetLine)]
         [ProducesResponseType(typeof(AnnotatedTimecardLine), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(InvalidStateError), 409)]
-        public IActionResult ReplaceLine(string id, [FromBody] TimecardLine timecardLine)
+        public IActionResult ReplaceLine(string id, [FromBody] TimecardPutLine timecardLine)
         {
             Timecard timecard = Database.Find(id);
 
@@ -432,17 +432,17 @@ namespace restapi.Controllers
             }
         }
 
-      /*Update (PATCH) a line item */
+      /*Update (PATCH) a line item */ 
         [HttpPatch("{id}/update")]
         [Produces(ContentTypes.TimesheetLine)]
         [ProducesResponseType(typeof(AnnotatedTimecardLine), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(typeof(InvalidStateError), 409)]
-        public IActionResult UpdateLine(string id, [FromBody] TimecardLine timecardLine)
+        public IActionResult UpdateLine(string id, [FromBody] TimecardPatchLine timecardPatchLine)
         {
             Timecard timecard = Database.Find(id);
 
-            if (timecard != null || timecardLine!=null)
+            if (timecard != null || timecardPatchLine!=null)
             {
                 
                 if (timecard.Status != TimecardStatus.Draft)
@@ -451,7 +451,7 @@ namespace restapi.Controllers
                 }
 
                 
-                    var annotatedLine = timecard.UpdateLine(timecard,timecardLine);  
+                    var annotatedLine = timecard.UpdateLine(timecard,timecardPatchLine);  
                     if(annotatedLine==null)
                     {
                         return NotFound();
@@ -467,5 +467,6 @@ namespace restapi.Controllers
         }
 
         
+
     }
 }

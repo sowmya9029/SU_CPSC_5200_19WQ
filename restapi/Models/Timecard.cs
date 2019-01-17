@@ -131,7 +131,7 @@ namespace restapi.Models
                     links.Add(new ActionLink() {
                         Method = Method.Post,
                         Type = ContentTypes.TimesheetLine,
-                        Relationship = ActionRelationship.Remove,
+                        Relationship = ActionRelationship.Replace,
                         Reference = $"/timesheets/{Identity.Value}/replace"
                     });
                     
@@ -139,7 +139,7 @@ namespace restapi.Models
                       links.Add(new ActionLink() {
                         Method = Method.Patch,
                         Type = ContentTypes.TimesheetLine,
-                        Relationship = ActionRelationship.Remove,
+                        Relationship = ActionRelationship.Update,
                         Reference = $"/timesheets/{Identity.Value}/update"
                     });
                     break;
@@ -216,65 +216,65 @@ namespace restapi.Models
         }
 
 
-        public AnnotatedTimecardLine ReplaceLine(Timecard timecard,TimecardLine timecardLine)
+        public AnnotatedTimecardLine ReplaceLine(Timecard timecard,TimecardPutLine timecardLine)
         {
-            var annotatedLine = new AnnotatedTimecardLine(timecardLine,timecardLine.LineNumber);
-             bool replace =false;
+           
+            
+             
                 for(int i =0;i<timecard.Lines.Count;i++)
                 {  
-                 TimecardLine l = timecard.Lines[i];
+                 AnnotatedTimecardLine l = timecard.Lines[i];
+                 //replaces the whole dictionary line item when the linenumber matches default values are 0
                  if((l.LineNumber == timecardLine.LineNumber))
                     {
-                      replace = true;
-                      timecard.Lines[i].Week = timecardLine.Week;
-                      timecard.Lines[i].Day = timecardLine.Day;
-                      timecard.Lines[i].Year = timecardLine.Year;
-                      timecard.Lines[i].Hours = timecardLine.Hours;
-                      timecard.Lines[i].Project = timecardLine.Project; 
-                   break;
+                      l.Week = timecardLine.Week;
+                      l.Day = timecardLine.Day;
+                      l.Year = timecardLine.Year;
+                      l.Hours = timecardLine.Hours;
+                      l.Project = timecardLine.Project; 
+                      return l;
                     }
                 }
-               
-                if(replace==false)
-                {
-                     return null;
-                }  
+                              
             
             
-            return annotatedLine;
+            return null;
         }
-         public AnnotatedTimecardLine UpdateLine(Timecard timecard,TimecardLine timecardLine)
+
+        public AnnotatedTimecardLine UpdateLine(Timecard timecard,TimecardPatchLine timecardLine)
         {
-            var annotatedLine = new AnnotatedTimecardLine(timecardLine,timecardLine.LineNumber);
-            bool replace = false;
+         
                 for(int i =0;i<timecard.Lines.Count;i++)
-                {  
-                 TimecardLine l = timecard.Lines[i];
-                 if((l.LineNumber == timecardLine.LineNumber))
+                { 
+                    AnnotatedTimecardLine l = timecard.Lines[i];
+                    try
+                    {     
+                        //if the line number matches checks if the given values are not null and updates the dictionary with provided data               
+                        if((l.LineNumber == timecardLine.LineNumber))
+                            {
+                            
+                            
+                            if(timecardLine.Hours != null)
+                                l.Hours = timecardLine.Hours.GetValueOrDefault();
+
+                            if(timecardLine.Project != null)
+                                l.Project = timecardLine.Project;
+                            return l;
+                            }
+                       
+                    } 
+                    catch(FormatException)
                     {
-                      replace = true;
-                      if(timecardLine.Week != 0)
-                       timecard.Lines[i].Week = timecardLine.Week;                      
-                      
-                      if(timecardLine.Year != 0)
-                       timecard.Lines[i].Year = timecardLine.Year;
-
-                      if(timecardLine.Hours != 0)
-                      timecard.Lines[i].Hours = timecardLine.Hours;
-
-                      if(timecardLine.Project != null)
-                        timecard.Lines[i].Project = timecardLine.Project;
-
-                      timecard.Lines[i].Day = timecardLine.Day;                    
-                       break;
+                        Console.WriteLine("format exception");
+                        return null;
                     }
+                    
                 }
-                if(replace==false)
-                {
-                     return null;
-                }           
-            return annotatedLine;
+          return null;
         }
+                         
+            
+        
 
        
     }
