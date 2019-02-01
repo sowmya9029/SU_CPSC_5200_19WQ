@@ -446,7 +446,7 @@ namespace restapi.Controllers
                 return NotFound();
             }
         }
-
+ 
       /*Update (PATCH) a line item */ 
         [HttpPatch("{id}/update")]
         [Produces(ContentTypes.TimesheetLine)]
@@ -456,7 +456,9 @@ namespace restapi.Controllers
         public IActionResult UpdateLine(string id, [FromBody] TimecardPatchLine timecardPatchLine)
         {
             Timecard timecard = Database.Find(id);
-
+          //  Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<TimecardPatchLine> patchDoc = new Microsoft.AspNetCore.JsonPatch.JsonPatchDocument<TimecardPatchLine>();
+           // patchDoc.ApplyTo(timecardPatchLine);
+           
             if (timecard != null || timecardPatchLine!=null)
             {
                 
@@ -464,8 +466,7 @@ namespace restapi.Controllers
                 {
                     return StatusCode(409, new InvalidStateError() { });
                 }
-
-                
+              
                     var annotatedLine = timecard.UpdateLine(timecard,timecardPatchLine);  
                     if(annotatedLine==null)
                     {

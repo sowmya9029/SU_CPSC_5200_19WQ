@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using Microsoft.AspNetCore.JsonPatch;
 using Newtonsoft.Json;
 
 namespace restapi.Models
@@ -17,6 +18,10 @@ namespace restapi.Models
 
         public string Project { get; set; }
 
+        public static explicit operator TimecardLine(JsonPatchDocument<TimecardLine> v)
+        {
+            throw new NotImplementedException();
+        }
     }
  // model for http put request 
   public class TimecardPutLine
@@ -45,6 +50,7 @@ namespace restapi.Models
         public string Project { get; set; }
         [JsonRequired]
         public float LineNumber{get;set;}
+
     }
 
 
